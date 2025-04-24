@@ -5,9 +5,7 @@ import { ArrowLeft, Download, Heart, Activity, ArrowUpCircle } from "lucide-reac
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
-import { Card } from "@/components/ui/card"
-import { Chart } from "@/components/Chart"
-import { MoodPieChart } from "@/components/MoodPieChart"
+
 
 export default function ResultPage() {
   const [loading, setLoading] = useState(true)
@@ -48,7 +46,35 @@ export default function ResultPage() {
   
   // 保存（仮の実装）
   const saveResult = () => {
-    alert("結果を保存しました")
+    // 保存する分析結果データを作成
+    const resultToSave = {
+      date: new Date().toLocaleString('ja-JP'),
+      emotionAnalysis: emotionData
+    }
+    
+    // JSONデータの作成
+    const jsonData = JSON.stringify(resultToSave, null, 2)
+    
+    // Blobの作成
+    const blob = new Blob([jsonData], { type: 'application/json' })
+    
+    // ダウンロードリンクの作成
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `感情分析結果_${new Date().toLocaleDateString('ja-JP').replace(/\//g, '-')}.json`
+    
+    // リンクをクリックしてダウンロードを開始
+    document.body.appendChild(a)
+    a.click()
+    
+    // クリーンアップ
+    setTimeout(() => {
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    }, 100)
+    
+    alert("結果をダウンロードしました")
   }
 
   return (
@@ -106,7 +132,14 @@ export default function ResultPage() {
         <div className="text-xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-rose-400">
           分析結果
         </div>
-        <div className="w-9"></div> {/* スペーサー */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="rounded-full bg-white/70 backdrop-blur-sm hover:bg-white/80"
+          onClick={saveResult}
+        >
+          <Download className="w-5 h-5 text-gray-600" />
+        </Button>
       </header>
 
       <main className="flex-1 flex flex-col items-center justify-start px-4 pt-6 pb-24 relative z-10">
