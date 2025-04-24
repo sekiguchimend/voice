@@ -15,11 +15,27 @@ export default function RecordingPage() {
   const [showHand, setShowHand] = useState(true)
   const [recognizedText, setRecognizedText] = useState("")
   const [interimText, setInterimText] = useState("")
+  const [currentPromptIndex, setCurrentPromptIndex] = useState(0)
+  const [showCompletionMessage, setShowCompletionMessage] = useState(false)
   const audioVisualizerRef = useRef<HTMLCanvasElement>(null)
   const animationFrameRef = useRef<number>(0)
   const previousAudioDataRef = useRef<number[]>([])
   const recognitionRef = useRef<any>(null)
   const router = useRouter()
+
+  // プロンプトメッセージの配列
+  const promptMessages = [
+    "あなたが今抱えている悩みを教えてください",
+    "その悩みについて考えるとき、どのような気持ちになりますか？",
+    "その時の様子を詳しく固有名詞を出しながら教えてください",
+    "解答ありがとうございました。レポートが作成されました"
+  ]
+  
+  // メッセージ切り替えのアニメーション状態
+  const [messageTransition, setMessageTransition] = useState({
+    fadeOut: false,
+    fadeIn: true
+  })
 
   // セッションチェック
   useEffect(() => {
@@ -263,6 +279,38 @@ export default function RecordingPage() {
     ctx.stroke();
   }
 
+  // 10秒ごとにプロンプトを切り替えるロジック
+  useEffect(() => {
+    if (!isRecording) return
+
+    // 10秒ごとにメッセージを変更
+    const promptInterval = setInterval(() => {
+      if (currentPromptIndex < promptMessages.length - 1) {
+        // フェードアウト
+        setMessageTransition({ fadeOut: true, fadeIn: false })
+        
+        // フェードアウト後にメッセージ変更
+        setTimeout(() => {
+          setCurrentPromptIndex(prev => prev + 1)
+          setMessageTransition({ fadeOut: false, fadeIn: true })
+        }, 500)
+      } else {
+        // 最後のメッセージの場合、完了メッセージを表示
+        setShowCompletionMessage(true)
+        clearInterval(promptInterval)
+        
+        // 録音を自動的に停止
+        setTimeout(() => {
+          setIsRecording(false)
+        }, 1000)
+      }
+    }, 10000)
+
+    return () => {
+      clearInterval(promptInterval)
+    }
+  }, [isRecording, currentPromptIndex, promptMessages.length])
+
   useEffect(() => {
     let interval: NodeJS.Timeout
 
@@ -281,6 +329,11 @@ export default function RecordingPage() {
       if (recognitionRef.current) {
         recognitionRef.current.start()
       }
+      
+      // 録音開始時に最初のプロンプトに戻す
+      setCurrentPromptIndex(0)
+      setShowCompletionMessage(false)
+      setMessageTransition({ fadeOut: false, fadeIn: true })
     } else {
       setRecordingTime(0)
 
@@ -493,21 +546,29 @@ export default function RecordingPage() {
 
               {/* Text and mic inside heart */}
               <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center z-10">
-                <motion.p
-                  className="text-gray-800 mb-4 font-medium text-lg tracking-tight"
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  あなたが今抱えている悩みを教えてください
-                </motion.p>
+                <AnimatePresence mode="wait">
+                  <motion.p
+                    key={currentPromptIndex}
+                    className="text-gray-800 mb-4 font-medium text-lg tracking-tight"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ 
+                      opacity: messageTransition.fadeIn ? 1 : 0,
+                      y: messageTransition.fadeIn ? 0 : -10 
+                    }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    {promptMessages[currentPromptIndex]}
+                  </motion.p>
+                </AnimatePresence>
+                
                 <motion.p
                   className="text-gray-600 text-sm mb-6"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
                 >
-                  (回答時間目安: 10秒以上)
+                  {!showCompletionMessage ? "(回答時間目安: 10秒)" : ""}
                 </motion.p>
 
                 <div className="relative">
@@ -652,12 +713,12 @@ export default function RecordingPage() {
 
         <Button
           className={`px-6 rounded-xl shadow-sm ${
-            isRecording || recordingTime > 0
+            showCompletionMessage || recordingTime > 0
               ? "bg-gradient-to-r from-pink-500 to-rose-400 hover:from-pink-600 hover:to-rose-500 text-white"
               : "bg-gray-200 text-gray-400 cursor-not-allowed"
           }`}
-          disabled={!isRecording && recordingTime === 0}
-          onClick={isRecording || recordingTime > 0 ? goToResult : undefined}
+          disabled={!showCompletionMessage && recordingTime === 0}
+          onClick={showCompletionMessage || recordingTime > 0 ? goToResult : undefined}
         >
           次へ
           <ArrowRight className="w-4 h-4 ml-2" />
