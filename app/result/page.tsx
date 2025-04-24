@@ -1,10 +1,13 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ArrowLeft, Download, Heart, Activity } from "lucide-react"
+import { ArrowLeft, Download, Heart, Activity, ArrowUpCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
+import { Card } from "@/components/ui/card"
+import { Chart } from "@/components/Chart"
+import { MoodPieChart } from "@/components/MoodPieChart"
 
 export default function ResultPage() {
   const [loading, setLoading] = useState(true)
@@ -187,7 +190,8 @@ export default function ResultPage() {
           onClick={saveResult}
           className="px-8 py-2.5 rounded-md bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white font-medium border border-white/30 transition-all duration-200"
         >
-          保存
+          <Download className="w-4 h-4 mr-2" />
+          保存する
         </Button>
       </footer>
 
