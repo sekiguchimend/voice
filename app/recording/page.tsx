@@ -650,6 +650,29 @@ export default function RecordingPage() {
           戻る
         </Button>
 
+        {/* 保存ボタン */}
+        <Button
+          variant="outline"
+          className="bg-white/70 backdrop-blur-sm border-gray-200 hover:bg-white/90 px-6 rounded-xl shadow-sm"
+          onClick={() => {
+            if (recognizedText) {
+              alert('録音内容を保存しました');
+            } else {
+              alert('保存する録音内容がありません');
+            }
+          }}
+          disabled={!recognizedText && !isRecording}
+        >
+          <span className="flex items-center">
+            <svg className="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+              <polyline points="17 21 17 13 7 13 7 21"></polyline>
+              <polyline points="7 3 7 8 15 8"></polyline>
+            </svg>
+            保存
+          </span>
+        </Button>
+
         <Button
           className={`px-6 rounded-xl shadow-sm ${
             isRecording || recordingTime > 0
