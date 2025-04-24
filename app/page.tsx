@@ -169,7 +169,7 @@ export default function LoginPage() {
       </main>
       
       <footer className="relative z-10 p-6 text-center text-sm text-gray-600">
-        © 2023 Emotion Voice. All rights reserved.
+        © 2025 Emotion Voice. All rights reserved.
       </footer>
     </div>
   )
