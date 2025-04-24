@@ -146,7 +146,7 @@ export default function HomePage() {
 
       {/* Footer */}
       <div className="relative z-10 p-6 text-center text-gray-500 text-xs">
-        <p>© 2023 Emotion Voice Analyzer</p>
+        <p>© 2025 Emotion Voice Analyzer</p>
       </div>
     </div>
   )

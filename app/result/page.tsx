@@ -190,6 +190,11 @@ export default function ResultPage() {
           保存
         </Button>
       </footer>
+
+      {/* 著作権表示 */}
+      <div className="absolute bottom-20 left-0 right-0 z-10 p-2 text-center text-xs text-white/70">
+        <p>© 2025 Emotion Voice Analyzer</p>
+      </div>
     </div>
   )
 } 

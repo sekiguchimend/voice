@@ -686,6 +686,11 @@ export default function RecordingPage() {
           <ArrowRight className="w-4 h-4 ml-2" />
         </Button>
       </div>
+
+      {/* Footer */}
+      <div className="relative z-10 p-3 text-center text-gray-500 text-xs">
+        <p>© 2025 Emotion Voice Analyzer</p>
+      </div>
     </div>
   )
 } 
